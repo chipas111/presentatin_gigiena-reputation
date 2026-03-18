@@ -1010,6 +1010,10 @@ width: 100%;
   overflow: hidden;
 }
 
+.horizontal__wrap.is--black {
+  background-color: var(--gallery-black);
+}
+
 .horizontal__panel {
   flex: none;
   width: 100%;
@@ -1873,6 +1877,9 @@ width: 100%;
   margin-left: auto;
   margin-right: auto;
   overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .section-video-clinic.is-black {
