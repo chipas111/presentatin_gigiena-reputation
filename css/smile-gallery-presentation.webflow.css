@@ -992,7 +992,15 @@ width: 100%;
   position: relative;
 }
 
+.last-image {
+  width: 100%;
+}
 
+.last-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .horizontal-gallery__title {
   letter-spacing: -.04em;
