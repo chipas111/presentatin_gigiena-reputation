@@ -1223,6 +1223,48 @@ window.lenis = new Lenis({
       };
     });
   }
+  // -------------------- 15) STICKY STEPS (BASIC) --------------------
+  function initStickyStepsBasic(root) {
+    const containers = Array.from((root || document).querySelectorAll("[data-sticky-steps-init]"));
+    if (!containers.length) return;
+    containers.forEach((container) => {
+      if (container.dataset.stickyStepsInitialized === "true") return;
+      const items = Array.from(container.querySelectorAll("[data-sticky-steps-item]"));
+      if (!items.length) return;
+      container.dataset.stickyStepsInitialized = "true";
+      let rafId = null;
+      const updateSteps = () => {
+        rafId = null;
+        const viewportCenter = window.innerHeight / 2;
+        let closestIndex = 0;
+        let closestDistance = Infinity;
+        items.forEach((item, index) => {
+          const anchor = item.querySelector("[data-sticky-steps-anchor]");
+          if (!anchor) return;
+          const rect = anchor.getBoundingClientRect();
+          const anchorCenter = rect.top + rect.height / 2;
+          const distance = Math.abs(viewportCenter - anchorCenter);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closestIndex = index;
+          }
+        });
+        items.forEach((item, index) => {
+          let status = "active";
+          if (index < closestIndex) status = "before";
+          if (index > closestIndex) status = "after";
+          item.setAttribute("data-sticky-steps-item-status", status);
+        });
+      };
+      const requestUpdate = () => {
+        if (rafId !== null) return;
+        rafId = requestAnimationFrame(updateSteps);
+      };
+      window.addEventListener("scroll", requestUpdate, { passive: true });
+      window.addEventListener("resize", requestUpdate);
+      requestUpdate();
+    });
+  }
   // -------------------- INIT ALL ON WEBFLOW READY --------------------
   const initAll = () => {
     safeRun("LenisBridge", () => initLenisBridge());
@@ -1240,6 +1282,7 @@ window.lenis = new Lenis({
     safeRun("LogoWallCycle", () => initLogoWallCycle());
     safeRun("StackingCardsParallax", () => initStackingCardsParallax());
     safeRun("MasonryGrid", () => initMasonryGrid());
+    safeRun("StickyStepsBasic", () => initStickyStepsBasic());
     // После всех инитов — один общий refresh
     scheduleRefresh();
     // И ещё один refresh после полной загрузки (шрифты/картинки/AVIF)
