@@ -569,6 +569,10 @@
   background-color: var(--gallery-red);
 }
 
+.brand-wrap.is--black {
+  background-color: var(--gallery-black);
+}
+
 .block-title_content {
   grid-column-gap: 1.2em;
   grid-row-gap: 1.2em;
@@ -620,7 +624,7 @@
   margin-top: 0;
   margin-bottom: .25em;
   font-family: radiogrotesk-variable, Arial, sans-serif;
-  font-size: 7em;
+  font-size: 5.5em;
   font-weight: 400;
   line-height: .9;
 }
@@ -1602,7 +1606,7 @@ width: 100%;
 }
 
 .section-video-orlov {
-  background-color: #1e1e1e;
+  background-color: black;
   margin-left: auto;
   margin-right: auto;
   overflow: visible;
@@ -1613,7 +1617,7 @@ width: 100%;
   grid-row-gap: 5em;
   justify-content: center;
   align-items: center;
-  width: 28em;
+  width: 22em;
   margin-left: auto;
   margin-right: auto;
   padding-top: 10em;
@@ -1651,6 +1655,7 @@ width: 100%;
   grid-column-gap: 2em;
   grid-row-gap: 2em;
   justify-content: center;
+  align-items: center;
   display: flex;
 }
 
@@ -1799,6 +1804,15 @@ width: 100%;
   margin-left: auto;
   margin-right: auto;
   overflow: visible;
+}
+
+.is--contain {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-position: center;
+  object-fit: contain;
+  object-position: center;
 }
 
 .section-podcast.is-black {

@@ -359,12 +359,13 @@ window.lenis = new Lenis({
   // -------------------- 4) FLIP ON SCROLL --------------------
   function initFlipOnScroll() {
     if (!has("ScrollTrigger") || !has("Flip")) return;
-    const wrapperElements = document.querySelectorAll("[data-flip-element='wrapper']");
+    const wrapperElements = Array.from(document.querySelectorAll("[data-flip-element='wrapper']"));
     const targetEl = document.querySelector("[data-flip-element='target']");
-    if (!targetEl || !wrapperElements.length) return;
+    if (!targetEl || wrapperElements.length < 2) return;
     let tl;
-    function flipTimeline() {
+    const buildFlipTimeline = () => {
       if (tl) {
+        tl.scrollTrigger && tl.scrollTrigger.kill();
         tl.kill();
         gsap.set(targetEl, { clearProps: "all" });
       }
@@ -374,7 +375,8 @@ window.lenis = new Lenis({
           start: "center center",
           endTrigger: wrapperElements[wrapperElements.length - 1],
           end: "center center",
-          scrub: 0.25
+          scrub: 0.25,
+          invalidateOnRefresh: true
         }
       });
       wrapperElements.forEach((element, index) => {
@@ -395,13 +397,22 @@ window.lenis = new Lenis({
           })
         );
       });
+    };
+    const rebuildFlipTimeline = () => {
+      buildFlipTimeline();
       scheduleRefresh();
+    };
+    rebuildFlipTimeline();
+    const targetImage = targetEl.querySelector("img");
+    if (targetImage && !targetImage.complete) {
+      targetImage.addEventListener("load", rebuildFlipTimeline, { once: true });
+      targetImage.addEventListener("error", rebuildFlipTimeline, { once: true });
     }
-    flipTimeline();
+    window.addEventListener("load", rebuildFlipTimeline, { once: true });
     let resizeTimer;
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => flipTimeline(), 120);
+      resizeTimer = setTimeout(rebuildFlipTimeline, 120);
     });
   }
   // -------------------- 5) IMAGES ON SVG PATH --------------------
