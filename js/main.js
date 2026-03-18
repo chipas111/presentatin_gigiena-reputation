@@ -12,13 +12,9 @@ window.lenis = new Lenis({
   }
   // Register plugins
   const maybePlugins = [
-    window.Draggable,
-    window.InertiaPlugin,
-    window.Observer,
     window.ScrollTrigger,
     window.MotionPathPlugin,
     window.Flip,
-    window.ScrambleTextPlugin,
     window.SplitText
   ].filter(Boolean);
   try {
@@ -210,151 +206,6 @@ window.lenis = new Lenis({
         else masterTl.add(headingTl, `-=${overlapOffset}`);
       });
     });
-  }
-  // -------------------- 3) 3D CAROUSEL --------------------
-  function init3dImageCarousel() {
-    if (!has("Draggable") || !has("ScrollTrigger")) return;
-    let radius;
-    let draggableInstance;
-    let observerInstance;
-    let spin;
-    let intro;
-    let lastWidth = window.innerWidth;
-    const wrap = document.querySelector("[data-3d-carousel-wrap]");
-    if (!wrap) return;
-    const calcRadius = () => {
-      radius = window.innerWidth * 0.5;
-    };
-    const panels = () => wrap.querySelectorAll("[data-3d-carousel-panel]");
-    const content = () => wrap.querySelectorAll("[data-3d-carousel-content]");
-    const destroy = () => {
-      draggableInstance && draggableInstance.kill();
-      observerInstance && observerInstance.kill();
-      spin && spin.kill();
-      intro && intro.kill();
-      intro?.scrollTrigger?.kill();
-      gsap.set(panels(), { clearProps: "transform,transformOrigin" });
-      draggableInstance = null;
-      observerInstance = null;
-      spin = null;
-      intro = null;
-    };
-    const create = () => {
-      calcRadius();
-      const pList = panels();
-      if (!pList.length) return;
-      const cList = content();
-      const proxy = document.createElement("div");
-      const wrapProgress = gsap.utils.wrap(0, 1);
-      const dragDistance = window.innerWidth * 3;
-      let startProg = 0;
-      pList.forEach((p) => {
-        p.style.transformOrigin = `50% 50% ${-radius}px`;
-      });
-      spin = gsap.fromTo(
-        pList,
-        { rotationY: (i) => (i * 360) / pList.length },
-        { rotationY: "-=360", duration: 30, ease: "none", repeat: -1 }
-      );
-      spin.progress(0.999);
-      draggableInstance = window.Draggable.create(proxy, {
-        trigger: wrap,
-        type: "x",
-        inertia: !!window.InertiaPlugin,
-        allowNativeTouchScrolling: true,
-        onPress() {
-          gsap.to(cList, tweenClipPathVars({
-            clipPath: "inset(5%)",
-            duration: 0.3,
-            ease: "power4.out",
-            overwrite: "auto"
-          }));
-          spin && spin.timeScale(0);
-          startProg = spin ? spin.progress() : 0;
-        },
-        onDrag() {
-          if (!spin) return;
-          const p = startProg + (this.startX - this.x) / dragDistance;
-          spin.progress(wrapProgress(p));
-        },
-        onThrowUpdate() {
-          if (!spin) return;
-          const p = startProg + (this.startX - this.x) / dragDistance;
-          spin.progress(wrapProgress(p));
-        },
-        onRelease() {
-          if (spin && (!this.tween || !this.tween.isActive())) {
-            gsap.to(spin, { timeScale: 1, duration: 0.1 });
-          }
-          gsap.to(cList, tweenClipPathVars({
-            clipPath: "inset(0%)",
-            duration: 0.5,
-            ease: "power4.out",
-            overwrite: "auto"
-          }));
-        },
-        onThrowComplete() {
-          spin && gsap.to(spin, { timeScale: 1, duration: 0.1 });
-        }
-      })[0];
-      intro = gsap.timeline({
-        scrollTrigger: {
-          trigger: wrap,
-          start: "top 80%",
-          end: "bottom top",
-          scrub: false,
-          toggleActions: "play resume play play"
-        },
-        defaults: { ease: "expo.inOut" }
-      });
-      intro
-        .fromTo(spin, { timeScale: 15 }, { timeScale: 1, duration: 2 })
-        .fromTo(wrap, { scale: 0.5, rotation: 12 }, { scale: 1, rotation: 5, duration: 1.2 }, "<")
-        .fromTo(cList, { autoAlpha: 0 }, { autoAlpha: 1, stagger: { amount: 0.8, from: "random" } }, "<");
-      if (has("Observer")) {
-        observerInstance = window.Observer.create({
-          target: window,
-          type: "wheel,scroll,touch",
-          onChangeY: (self) => {
-            if (!spin) return;
-            let v = gsap.utils.clamp(-60, 60, self.velocityY * 0.005);
-            spin.timeScale(v);
-            const resting = v < 0 ? -1 : 1;
-            gsap.fromTo(
-              { value: v },
-              { value: v },
-              {
-                value: resting,
-                duration: 1.2,
-                onUpdate() {
-                  spin && spin.timeScale(this.targets()[0].value);
-                }
-              }
-            );
-          }
-        });
-      }
-    };
-    create();
-    const debounce = (fn, ms) => {
-      let t;
-      return () => {
-        clearTimeout(t);
-        t = setTimeout(fn, ms);
-      };
-    };
-    window.addEventListener(
-      "resize",
-      debounce(() => {
-        const newWidth = window.innerWidth;
-        if (newWidth !== lastWidth) {
-          lastWidth = newWidth;
-          destroy();
-          create();
-          scheduleRefresh();
-        }
-      }, 200)
-    );
   }
   // -------------------- 4) FLIP ON SCROLL --------------------
   function initFlipOnScroll() {
@@ -832,37 +683,6 @@ window.lenis = new Lenis({
       resizeTimer = setTimeout(bgZoomTimeline, 120);
     });
   }
-  // -------------------- 9) BEFORE/AFTER SPLIT --------------------
-  function initBeforeAfterSplitSlider() {
-    if (!has("Draggable")) return;
-    const splitters = document.querySelectorAll('[data-splitter="wrap"]');
-    if (!splitters.length) return;
-    splitters.forEach((splitter) => {
-      const handle = splitter.querySelector('[data-splitter="handle"]');
-      const after = splitter.querySelector('[data-splitter="after"]');
-      if (!handle || !after) return;
-      let bounds = splitter.getBoundingClientRect();
-      let currentPercent = parseFloat(splitter.getAttribute("data-splitter-initial")) || 50;
-      const setPositions = (percent) => {
-        bounds = splitter.getBoundingClientRect();
-        const positionX = (percent / 100) * bounds.width;
-        gsap.set(handle, { x: positionX, left: "unset" });
-        setClipPath(after, `inset(0 0 0 ${percent}%)`);
-      };
-      setPositions(currentPercent);
-      window.Draggable.create(handle, {
-        type: "x",
-        bounds: splitter,
-        cursor: "ew-resize",
-        activeCursor: "grabbing",
-        onDrag() {
-          currentPercent = (this.x / bounds.width) * 100;
-          setClipPath(after, `inset(0 0 0 ${currentPercent}%)`);
-        }
-      });
-      window.addEventListener("resize", () => setPositions(currentPercent));
-    });
-  }
   // -------------------- 10) GLOBAL PARALLAX --------------------
   function initGlobalParallax() {
     if (!has("ScrollTrigger")) return;
@@ -911,84 +731,6 @@ window.lenis = new Lenis({
         return () => ctx.revert();
       }
     );
-  }
-  // -------------------- 11) SCRAMBLE TEXT --------------------
-  function initScramble() {
-    if (!has("ScrollTrigger") || !has("ScrambleTextPlugin") || !has("SplitText")) return;
-    function initScrambleOnLoad() {
-      document.querySelectorAll('[data-scramble="load"]').forEach((target) => {
-        const split = new window.SplitText(target, {
-          type: "words, chars",
-          wordsClass: "word",
-          charsClass: "char"
-        });
-        gsap.to(split.words, {
-          duration: 1.2,
-          stagger: 0.01,
-          scrambleText: { text: "{original}", chars: "upperCase", speed: 0.85 },
-          onComplete: () => split.revert()
-        });
-      });
-    }
-    function initScrambleOnScroll() {
-      document.querySelectorAll('[data-scramble="scroll"]').forEach((target) => {
-        const isAlternative = target.hasAttribute("data-scramble-alt");
-        // используем секцию как триггер, чтобы ждать, пока она целиком войдёт во вьюпорт
-        const triggerEl =
-          target.closest("[data-scramble-trigger]") ||
-          target.closest("section") ||
-          target;
-        const split = new window.SplitText(target, {
-          type: "words, chars",
-          wordsClass: "word",
-          charsClass: "char"
-        });
-        gsap.to(split.words, {
-          duration: 1.4,
-          stagger: 0.015,
-          scrambleText: {
-            text: "{original}",
-            chars: isAlternative ? "▯|" : "upperCase",
-            speed: 0.95
-          },
-          scrollTrigger: {
-            trigger: triggerEl,
-            start: "top 20%", // запускаем, когда секция уже ~80% в вьюпорте
-            once: true,
-            invalidateOnRefresh: true
-          },
-          onComplete: () => split.revert()
-        });
-      });
-    }
-    function initScrambleOnHover() {
-      document.querySelectorAll('[data-scramble-hover="link"]').forEach((target) => {
-        const textEl = target.querySelector('[data-scramble-hover="target"]');
-        if (!textEl) return;
-        const originalText = textEl.textContent || "";
-        const customHoverText = textEl.getAttribute("data-scramble-text");
-        const split = new window.SplitText(textEl, {
-          type: "words, chars",
-          wordsClass: "word",
-          charsClass: "char"
-        });
-        target.addEventListener("mouseenter", () => {
-          gsap.to(textEl, {
-            duration: 1,
-            scrambleText: { text: customHoverText ? customHoverText : originalText, chars: "◊▯∆|" }
-          });
-        });
-        target.addEventListener("mouseleave", () => {
-          gsap.to(textEl, {
-            duration: 0.3,
-            scrambleText: { text: originalText, speed: 2, chars: "◊▯∆" }
-          });
-        });
-      });
-    }
-    initScrambleOnLoad();
-    initScrambleOnScroll();
-    initScrambleOnHover();
   }
   // -------------------- 12) LOGO WALL CYCLE --------------------
   function initLogoWallCycle() {
@@ -1119,121 +861,6 @@ window.lenis = new Lenis({
       });
     });
   }
-  //--------------------- Stacking Cards Parallax ------------------------
-  let stackingTLs = [];
-  function destroyStackingCardsParallax() {
-    stackingTLs.forEach((tl) => tl.kill());
-    stackingTLs = [];
-  }
-  function initStackingCardsParallax() {
-    if (!has("ScrollTrigger")) return;
-    destroyStackingCardsParallax();
-    const cards = document.querySelectorAll("[data-stacking-cards-item]");
-    if (cards.length < 2) return;
-    cards.forEach((card, i) => {
-      if (i === 0) return;
-      const previousCard = cards[i - 1];
-      if (!previousCard) return;
-      const previousCardImage = previousCard.querySelector("[data-stacking-cards-img]");
-      const tl = gsap.timeline({
-        defaults: { ease: "none", duration: 1 },
-        scrollTrigger: {
-          id: "stackingCards",
-          trigger: card,
-          start: "top bottom",
-          end: "top top",
-          scrub: true,
-          invalidateOnRefresh: true
-        }
-      });
-      tl.fromTo(previousCard, { yPercent: 0 }, { yPercent: 50 });
-      if (previousCardImage) {
-        tl.fromTo(previousCardImage, { rotate: 0, yPercent: 0 }, { rotate: -5, yPercent: -25 }, "<");
-      }
-      stackingTLs.push(tl);
-    });
-    scheduleRefresh();
-    // refresh, когда догружаются картинки в карточках
-    document.querySelectorAll("[data-stacking-cards-img]").forEach((img) => {
-      if (!img.complete) img.addEventListener("load", scheduleRefresh, { once: true });
-    });
-  }
-  // ------------------------- Masonry grid --------------------------------
-  function initMasonryGrid() {
-    document.querySelectorAll("[data-masonry-list]").forEach(container => {
-      const shuffle = container.dataset.masonryShuffle !== "false";
-      let cols, gapPx, colHeights;
-      const getVars = () => {
-        const cs = getComputedStyle(container);
-        cols = parseInt(cs.getPropertyValue("--masonry-col"));
-        const rawGap = cs.getPropertyValue("--masonry-gap").trim();
-        if (rawGap.endsWith("px")) gapPx = parseFloat(rawGap);
-        else if (rawGap.endsWith("em")) gapPx = parseFloat(rawGap) * parseFloat(cs.fontSize);
-        else if (rawGap.endsWith("rem")) gapPx = parseFloat(rawGap) * parseFloat(getComputedStyle(document.documentElement).fontSize);
-        else gapPx = parseFloat(rawGap);
-      };
-      const layout = () => {
-        getVars();
-        const wCalc = `(100% - ${(cols - 1)}*var(--masonry-gap)) / ${cols}`;
-        colHeights = Array(cols).fill(0);
-        container.style.position = "relative";
-        const items = Array.from(container.children);
-        items.forEach(el => {
-          el.style.position = "absolute";
-          el.style.width = `calc(${wCalc})`;
-        });
-        items.forEach((el, i) => {
-          const h = el.offsetHeight;
-          const idx = shuffle ? colHeights.indexOf(Math.min(...colHeights)) : (i % cols);
-          el.style.top = `${colHeights[idx]}px`;
-          el.style.left = `calc(${wCalc}*${idx} + var(--masonry-gap)*${idx})`;
-          colHeights[idx] += h + gapPx;
-        });
-        container.style.height = `${Math.max(...colHeights)}px`;
-        // После перераскладки меняются высоты => нужен refresh триггеров
-        scheduleRefresh();
-      };
-      const debounce = (fn, delay) => {
-        let t;
-        return () => {
-          clearTimeout(t);
-          t = setTimeout(fn, delay);
-        };
-      };
-      const onResize = debounce(layout, 100);
-      window.addEventListener("resize", onResize);
-      const debouncedLayout = debounce(layout, 50);
-      const imgLoad = () => {
-        container.querySelectorAll("img").forEach(img => {
-          if (!img.complete) {
-            img.addEventListener("load", debouncedLayout, { once: true });
-            img.addEventListener("error", debouncedLayout, { once: true });
-          }
-        });
-      };
-      layout();
-      imgLoad();
-      container._masonry = {
-        recalc: () => {
-          layout();
-          imgLoad();
-        },
-        destroy: () => {
-          window.removeEventListener("resize", onResize);
-          const items = Array.from(container.children);
-          items.forEach(el => {
-            el.style.position =
-            el.style.width =
-            el.style.top =
-            el.style.left = "";
-          });
-          container.style.position =
-          container.style.height = "";
-          scheduleRefresh();
-        }
-      };
-    });
-  }
   // -------------------- 15) STICKY STEPS (BASIC) --------------------
   function initStickyStepsBasic(root) {
     const containers = Array.from((root || document).querySelectorAll("[data-sticky-steps-init]"));
@@ -1281,18 +908,13 @@ window.lenis = new Lenis({
     safeRun("LenisBridge", () => initLenisBridge());
     safeRun("StickyFeatures", () => initStickyFeatures());
     safeRun("StickyTitleScroll", () => initStickyTitleScroll());
-    safeRun("3DCarousel", () => init3dImageCarousel());
     safeRun("FlipOnScroll", () => initFlipOnScroll());
     safeRun("HorizontalScrolling", () => initHorizontalScrolling());
     safeRun("ImagesOnPath", () => initImagesOnPathScroll());
     safeRun("RadialTextMarquee", () => initRadialTextMarquee());
     safeRun("BackgroundZoom", () => initBackgroundZoom());
-    safeRun("BeforeAfterSplit", () => initBeforeAfterSplitSlider());
     safeRun("GlobalParallax", () => initGlobalParallax());
-    safeRun("ScrambleText", () => initScramble());
     safeRun("LogoWallCycle", () => initLogoWallCycle());
-    safeRun("StackingCardsParallax", () => initStackingCardsParallax());
-    safeRun("MasonryGrid", () => initMasonryGrid());
     safeRun("StickyStepsBasic", () => initStickyStepsBasic());
     // После всех инитов — один общий refresh
     scheduleRefresh();

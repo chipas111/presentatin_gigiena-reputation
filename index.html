@@ -506,6 +506,7 @@
             </div>
           </div>
         </div>
+        <div class="spacer-big"></div>
       </section>
       <section class="section is-company-brand">
         <div class="spacer-big"></div>
@@ -805,9 +806,15 @@
           </div>
           <div class="spacer-big"></div>
         </div>
+
         <div class="last-image">
-          <img src="images/last-slide.webp" alt="">
+          <div class="image-mask" data-parallax="trigger" data-parallax-start="8" data-parallax-end="-8">
+            <div class="image-parallax-target" data-parallax="target">
+              <img src="images/last-slide.webp" alt="">
+            </div>
+          </div>
         </div>
+
       </section>
       <section class="footer-section">
         <div class="footer-wrap">
@@ -819,7 +826,11 @@
                 <p class="footer_para">Создаю сайты, которые помогают брендам выделяться в цифровом шуме.</p>
               </div>
               <div class="footer_col">
-                <img src="./images/dmitrii-golub.webp" alt="">
+                <div class="footer-photo-mask" data-parallax="trigger" data-parallax-start="-10" data-parallax-end="10" data-parallax-scroll-start="top bottom" data-parallax-scroll-end="bottom bottom">
+                  <div class="footer-photo-parallax-target" data-parallax="target">
+                    <img src="./images/dmitrii-golub.webp" alt="">
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -835,14 +846,9 @@
   <script src="js/vendor/gsap.min.js" type="text/javascript"></script>
   <script src="js/vendor/ScrollTrigger.min.js" type="text/javascript"></script>
   <script src="js/vendor/SplitText.min.js" type="text/javascript"></script>
-  <script src="js/vendor/Draggable.min.js" type="text/javascript"></script>
-  <script src="js/vendor/InertiaPlugin.min.js" type="text/javascript"></script>
-  <script src="js/vendor/Observer.min.js" type="text/javascript"></script>
   <script src="js/vendor/Flip.min.js" type="text/javascript"></script>
   <script src="js/vendor/MotionPathPlugin.min.js" type="text/javascript"></script>
-  <script src="js/vendor/CustomEase.min.js" type="text/javascript"></script>
-  <script src="js/vendor/ScrambleTextPlugin.min.js" type="text/javascript"></script>
-  <script type="text/javascript">gsap.registerPlugin(ScrollTrigger,SplitText,Draggable,InertiaPlugin,Observer,Flip,MotionPathPlugin,CustomEase,ScrambleTextPlugin);</script>
+  <script type="text/javascript">gsap.registerPlugin(ScrollTrigger,SplitText,Flip,MotionPathPlugin);</script>
   <script src="js/main.js" type="text/javascript"></script>
 </body>
 </html>

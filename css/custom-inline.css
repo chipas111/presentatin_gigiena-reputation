@@ -81,20 +81,6 @@ body {
   visibility: visible;
 }
 
-/* 3D Carousel */
-.wf-design-mode .img-carousel__panel {
-  position: relative;
-}
-
-.wf-design-mode .img-carousel__list {
-  overflow: auto;
-  justify-content: flex-start;
-}
-
-.img-carousel__panel:nth-of-type(even) {
-  justify-content: center;
-}
-
 /* Brand Cards */
 /* This is optional! Only add if you're NOT going to use a CMS list.
 The below snippet will stack your items in the Webflow designer and editor only, so you can edit content easier. */
@@ -118,32 +104,6 @@ The below snippet will stack your items in the Webflow designer and editor only,
   overflow: auto;
 }
 
-/* Before After Split Slider */
-img::selection {
-  background: none;
-}
-
-.splitter-handle__center::after {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 100em;
-  opacity: 1;
-  border: 1px solid white;
-  transition: all 0.4s cubic-bezier(0.35, 1, 0.6, 1);
-}
-
-.splitter-handle:hover .splitter-handle__center::after {
-  width: 130%;
-  height: 130%;
-  opacity: 0.5;
-}
-
 /* Social logos */
 [data-logo-wall-list] [data-logo-wall-item]:nth-child(n+9) {
   display: none;
@@ -152,26 +112,6 @@ img::selection {
 @media screen and (max-width: 991px) {
   [data-logo-wall-list] [data-logo-wall-item]:nth-child(n+7) {
     display: none;
-  }
-}
-
-/* Masonry grid */
-[data-masonry-list] {
-  --masonry-col: 4;
-  --masonry-gap: 1em;
-}
-
-@media screen and (max-width: 991px) {
-  [data-masonry-list] {
-    --masonry-col: 3;
-    --masonry-gap: 1em;
-  }
-}
-
-@media screen and (max-width: 767px) {
-  [data-masonry-list] {
-    --masonry-col: 2;
-    --masonry-gap: 0.5em;
   }
 }
 
