@@ -168,6 +168,12 @@
   line-height: 1.4;
 }
 
+.para-small {
+  font-family: radiogrotesk-variable, Arial, sans-serif;
+  font-size: 1.2em;
+  line-height: 1.4;
+}
+
 .button {
   border: 1px solid var(--gallery-white);
   text-transform: uppercase;
@@ -1632,7 +1638,7 @@ width: 100%;
   flex-flow: column;
   justify-content: center;
   align-items: flex-start;
-  width: 30em;
+  width: 22em;
   padding-top: 10em;
   padding-bottom: 10em;
   display: flex;
