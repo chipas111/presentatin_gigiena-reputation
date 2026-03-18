@@ -1,0 +1,176 @@
+/* ------------------------- Scaling System by Osmo [https://osmo.supply/] ------------------------- */
+/* Desktop */
+:root {
+  --size-unit: 16; /* body font-size in design - no px */
+  --size-container-ideal: 1440; /* screen-size in design - no px */
+  --size-container-min: 992px;
+  --size-container-max: 1920px;
+  --size-container: clamp(var(--size-container-min), 100vw, var(--size-container-max));
+  --size-font: calc(var(--size-container) / (var(--size-container-ideal) / var(--size-unit)));
+}
+
+/* Tablet */
+@media screen and (max-width: 991px) {
+  :root {
+    --size-container-ideal: 834; /* screen-size in design - no px */
+    --size-container-min: 768px;
+    --size-container-max: 991px;
+  }
+}
+
+/* Mobile Landscape */
+@media screen and (max-width: 767px) {
+  :root {
+    --size-container-ideal: 550; /* screen-size in design - no px */
+    --size-container-min: 480px;
+    --size-container-max: 767px;
+  }
+}
+
+/* Mobile Portrait */
+@media screen and (max-width: 479px) {
+  :root {
+    --size-container-ideal: 390; /* screen-size in design - no px */
+    --size-container-min: 320px;
+    --size-container-max: 479px;
+  }
+}
+
+body {
+  font-size: var(--size-font);
+}
+
+.container {
+  max-width: var(--size-container);
+}
+
+.container.medium {
+  max-width: calc(var(--size-container) * 0.85);
+}
+
+.container.small {
+  max-width: calc(var(--size-container) * 0.7);
+}
+
+.w-webflow-badge {
+  opacity: 0% !important;
+}
+
+/* Webflow Designer resets to show hidden content: */
+.wf-design-mode .sticky-features__text-list {
+  overflow: auto;
+  max-height: 45em;
+  gap: 2em;
+  justify-content: flex-start;
+}
+
+.wf-design-mode .sticky-features__text-item {
+  position: relative;
+}
+
+.wf-design-mode [data-sticky-feature-item] {
+  visibility: visible;
+}
+
+/* Show only 1st items on live site */
+[data-sticky-feature-visual-wrap]:first-of-type {
+  clip-path: inset(0% round 0.75em);
+}
+
+[data-sticky-feature-item]:first-of-type {
+  visibility: visible;
+}
+
+/* 3D Carousel */
+.wf-design-mode .img-carousel__panel {
+  position: relative;
+}
+
+.wf-design-mode .img-carousel__list {
+  overflow: auto;
+  justify-content: flex-start;
+}
+
+.img-carousel__panel:nth-of-type(even) {
+  justify-content: center;
+}
+
+/* Brand Cards */
+/* This is optional! Only add if you're NOT going to use a CMS list.
+The below snippet will stack your items in the Webflow designer and editor only, so you can edit content easier. */
+.wf-design-mode .motionpath-content-list,
+.w-editor .motionpath-content-list {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: scroll;
+}
+
+.wf-design-mode .motionpath-content-item,
+.w-editor .motionpath-content-item {
+  position: relative;
+}
+
+/* Horizontal scroll */
+/* Add auto overflow in webflow to make editing easier */
+.wf-design-mode [data-horizontal-scroll-wrap],
+.wf-design-mode [data-horizontal-gallery-wrap] {
+  overflow: auto;
+}
+
+/* Before After Split Slider */
+img::selection {
+  background: none;
+}
+
+.splitter-handle__center::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 100em;
+  opacity: 1;
+  border: 1px solid white;
+  transition: all 0.4s cubic-bezier(0.35, 1, 0.6, 1);
+}
+
+.splitter-handle:hover .splitter-handle__center::after {
+  width: 130%;
+  height: 130%;
+  opacity: 0.5;
+}
+
+/* Social logos */
+[data-logo-wall-list] [data-logo-wall-item]:nth-child(n+9) {
+  display: none;
+}
+
+@media screen and (max-width: 991px) {
+  [data-logo-wall-list] [data-logo-wall-item]:nth-child(n+7) {
+    display: none;
+  }
+}
+
+/* Masonry grid */
+[data-masonry-list] {
+  --masonry-col: 4;
+  --masonry-gap: 1em;
+}
+
+@media screen and (max-width: 991px) {
+  [data-masonry-list] {
+    --masonry-col: 3;
+    --masonry-gap: 1em;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  [data-masonry-list] {
+    --masonry-col: 2;
+    --masonry-gap: 0.5em;
+  }
+}
