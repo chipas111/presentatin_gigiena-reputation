@@ -2203,6 +2203,15 @@ width: 100%;
   }
 }
 
+.is--h-auto {
+  height: auto;
+}
+
+.margin-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 
 
 
